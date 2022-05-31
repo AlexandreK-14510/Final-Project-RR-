@@ -1,0 +1,347 @@
+---
+title: "Final Project"
+author: "Alexandre Guérin K-14510; Agathe ZEKAD K-14508"
+date: '2022-05-11'
+output: 
+    html_document:
+      toc: true
+      toc_float: true
+      number_sections: true
+      toc_depth: 2
+      theme: united
+      tidy: styler
+      highlight: arrow
+      fontsize: 10pt
+      code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(readxl)
+Final_project <- read_excel("C:/Users/agath/Desktop/RR1/Final Project/Final project.xlsx")
+Final_project_Copie <- read_excel("C:/Users/agath/Desktop/RR1/Final Project/Final project - Copie.xlsx")
+Table_1 <- read_excel("C:/Users/agath/Desktop/RR1/Final Project/Table 1.xlsx")
+New_Data <- read_excel("C:/Users/agath/Desktop/RR1/Final Project/New Data.xlsx")
+```
+
+
+***
+# Introduction
+> There is a well-known economic theory that an increase in the minimum wage leads to a reduction in low-wage jobs. This theory is based on aggregate time series studies (about 30 studies).
+
+In *Charles Brown's* (1982) historical survey, it is summarised that a 10% increase in the minimum wage leads to a 1-3% reduction in the youth employment rate. The lower end of this range is the most plausible.
+
+In studies by *Alliston Wellington* (1991) and *Jacob Klerman* (1992), they found a weaker effect of this minimum wage increase on the employment rate. 
+
+In contrast to the classic time series literature, more recent studies based on cross-sectional comparisons by *Card, Laurence Katz and Krueger* in 1992; *Card and Krueger*, *Stephen Machin and Alan Manning* in 1994 found the employment effects of the minimum wage to be negligible or even slightly positive. 
+
+In view of this opposition between time-series and cross-sectional studies, it is important to assess the validity of time-series estimates. Thus in this study by *Card and Alan Krueger*, a "meta-analysis" of the time series literature is presented. The analysis is based on studies that have access to many more observations.
+
+The theory suggests that there is an **"inverse square root"** relationship between sample size and the **"t-ratio"** obtained in the studies. 
+
+The results show that the **"t-ratios" of the different studies are negatively correlated** with the sample sizes. The ratios and coefficients are therefore biased. Furthermore, the estimated effect of the minimum wage on the employment rate tends to be 2 times larger than its standard error, regardless of the sample size. 
+
+Thus the time series literature has probably been affected by a combination of **publication biases**, so there is a tendency for statistically significant results to be over-represented. 
+
+***
+# Publication Bias
+
+It has long been argued that academic journals tend to publish articles with results that are "statistically significant" (*Colin Begg and Jesse Berlin*, 1988; *Bradford De Long and Kevin Lang*, 1992). 
+
+In statistics, significance is judged by whether the t-ratio for the main explanatory variable (*variable that explains the model*) **exceeds 2** in absolute value.
+
+Furthermore, a statistical analysis is more decisive if the null hypothesis of zero is rejected.
+
+> There is therefore a natural tendency for reviewers and editors to look more favourably on studies with statistically significant results.
+
+In the case of the **minimum wage**, economists have a strong theoretical **presumption that an increase in the minimum wage will decrease employment**.
+
+- This presumption points to two sources of publication bias.
+- First, reviewers and editors may be **predisposed to accept articles that show a "significant negative effect" of the minimum wage**.
+- Second, researchers may use the criterion of a significant negative effect on employment as a **guide in choosing their empirical specifications** (control variables included, functional form imposed, sample analysed, estimation technique used).
+
+> It is this discretion that can lead to bias if particular choices are determined in part by whether or not they generate negative and statistically significant employment effects. 
+
+***
+# Meta-analysis
+
+> Meta-analysis is the quantitative analysis of a set of studies.
+
+This technique is used to summarise a set of related studies, to assess the reliability of the results and to test for publication bias.
+
+In the case of time series studies on the minimum wage, a test for publication bias makes sense in view of the more recent studies that use more data.
+
+The more recent studies use up to twice as many observations as the early studies; this doubling of the sample size should reduce the standard error of the estimated employment effect.
+
+The absolute value of the t-ratio should vary in proportion to the square root of the number of degrees of freedom, and a regression of the log of one on the log of the other should yield a coefficient of 1.
+
+Aggregate time series data are unlikely to be independent. With dependent observations, the t ratio is expected to increase with sample size.
+
+- What could prevent this increase ? 
+
+A publication bias would cause early studies to have a high t-ratio despite a small sample size. 
+
+Or a structural change that could alter the statistical model; if the effect of the minimum wage has weakened over time, the t-ratio could remain constant or even decrease as the sample size increases.
+
+***
+# Results
+In this study, to examine whether publication bias exists, *Card and Alan Krueger* related "t-ratios" to sample size and other study characteristics. They used 15 studies, 12 published before 1981 and three more recent ones (*Garry Solo*, 1985; *Wellington*, 1991 and *Klerman*, 1992). In each study the "t-ratio" on the author's preferred minimum wage variable was chosen. The experiment limits the sample to the subset of studies that use a **logarithmic specification**. 
+
+The original data was not provided by the authors. 
+
+A group of students from a previous year therefore managed to collect some data despite a missing data item that was not clear to identify.
+
+
+***
+## Data table
+```{r}
+library(DT)
+datatable(Final_project_Copie)
+```
+
+***
+
+## Figure 1
+```{r}
+library(ggplot2)
+
+# Scatter plot
+a <- ggplot(Final_project, aes(x=squarerootdegreesoffreedom, y=tstatistic)) + geom_point(color = 'black', size=1, shape=16) + geom_text(size=3,hjust=-0.5, vjust=-0.5,aes(fontface=2), label=rownames(Final_project))
+
+# Ajouter la droite de regression
+a <- a + geom_smooth(method=lm, se= FALSE,color='darkseagreen', size= 0.7, fullrange=TRUE)
+
+# Add title
+a <- a + labs(
+  title='Figure 1.',
+  subtitle= 'Relation of Estimated t Ratios To Sample Size',
+  x="Square Root of Degrees of Freedom", 
+  y = "Absolute t ratio",
+  caption = 'Points = Actual',
+  tag = 'a)') + theme_bw()  
+
+#Personalize : ---> POLICE = face [1 (normal); 2(bold); 3(italic); 4(bold.italic)]
+
+a <- a + theme(
+  plot.title = element_text(face=2, color='red', hjust=0.5, size=15), 
+  plot.subtitle = element_text(face=3, color='black', hjust=0.5, size=10),
+  plot.caption = element_text(hjust=0, size = 8))
+
+print(a)
+```
+
+`The numbers in the figure refer to the following studies: 1) Hyman Kaitz, 1970; 2) Jacob Mincer, 1976;`
+`3) Edward Gramlich, 1976; 4) Finis Welch, 1976; 5) James Ragan, 1977; 6) Michael Wachter and Choongsoo Kim,` 
+`1979; 7) George Iden, 1980; 8) Ragan, 1981; 9) John M. Abowd and Mark R. Killingsworth,1981;`
+`10) Charles Betsey and Bruce Dunson, 1981; 11) Brown et al., 1983; 12) Daniel Hamermesh, 1981;` 
+`13) Solon, 1985; 14) Wellington, 1991; 15) Klerman, 1992. '`
+
+***
+We were able to reproduce Figure 1 from this meta-analysis identically.
+
+Figure 1 illustrates the relationship between the value of the "t-ratio" of each study and the square root of the study's degrees of freedom. Each point on the graph refers to the study mentioned in the note to the figure. In addition, the fitted regression line is also displayed on the graph. 
+
+> Thus, we see that contrary to the expected relationship of an upward slope between the "t-ratio" and the sample size, the graph shows a downward sloping line. Furthermore, *Iden's* 1980 study 7 is clearly an **outlier**. 
+
+***
+## Table 1
+
+```{r}
+library(DT)
+datatable(Table_1)
+```
+
+
+```{r}
+model <- lm(logtstatistic~logsquarerootdegreeoffreedom, data = Final_project)
+summary(model)
+a <- coef(model)
+print(a)
+```
+
+
+```{r}
+model <- lm(logtstatistic~logsquarerootdegreeoffreedom + autoregressioncorrection  + logarithmicspecification, data = Final_project)
+summary(model)
+a <- coef(model)[1]
+```
+
+
+```{r}
+model <- lm(logtstatistic~logsquarerootdegreeoffreedom + autoregressioncorrection  + logarithmicspecification + numberofexplanatoryvariables, data = Final_project)
+summary(model)
+a <- coef(model)[1]
+```
+
+`Notes : Standard errors are shown in parentheses. The sample includes the 15 studies specified` 
+`in the note to Figure 1.`
+
+***
+
+In **Table 1**. The multivariate descriptive regression is presented, which is a characteristic correlated with the sample size. Knowing that for each study the dependent variable is the "logarithm of ratio t".
+
+In the analysis, to respect the sampling theory, a **dummy variable equal to 1** is included in several cases: 
+- If the specification is logarithmic.
+- If the sample contains a subset of "teenagers (as opposed to all teenagers)".
+- If an autoregressive correction was used in the estimation, and a variable with the number of covariates included in the original model. 
+
+In **Table 1** (as suggested in Figure 1) there is a **negative relationship** between the "t-ratios" and the degrees of freedom. The square root coefficient of the degrees of freedom is far from 1 (theoretical expectation), as the inclusion of additional explanatory variables does not change its sign or effect. 
+
+In the construction of this table, we had the problem that we were missing a variable. In fact, we were able to collect all the variables except the one concerning the subset of teenagers because it was not identifiable in all the studies. We were therefore unable to code this variable. This is why we do not get exactly the same results as in the original table of the study. Despite this, it does not change the interpretation of the graph.
+
+***
+## Other estimates
+
+Other estimates based on other subsets : 
+
+- Subsample (all studies prior to 1982): negative correlation between "t-ratio" and degrees of freedom. 
+- Subsample (eliminating outlier 7): then the relationship is stronger between the "t-ratio" and the degrees of freedom. 
+- Subsample (the 11 studies that use a logarithmic specification): but again there is a negative relationship between the "t-ratio" and the degrees of freedom. 
+
+***
+# Is the t Ratio Always 2?
+
+Another type of **meta-analysis** relates the magnitude of the coefficient to its estimated standard error. In terms of expectations, one does not expect to systematically find a relationship between the estimated coefficients and their standard errors. 
+
+In this case, there is a publication bias with an absolute "t-ratio" greater than 2, so we want to find a positive value between the magnitude of the estimated employment effect and its standard errors as the "t-ratio" is given by **t = b / SE** with **b** (estimated employment effect) and **SE** (its standard error).  
+
+To overcome the problem - coefficients between each study are not directly comparable because the studies estimate different functional forms - the study uses estimates of the employment effect associated with a 10% increase in the minimum wage. 
+
+From this study, we obtain **Figure 2**, which presents the **dispersion of the absolute value of the minimum wage effects** with respect to their standard error but also a line corresponding to 2 times the standard error. 
+
+***
+## Figure 2
+```{r}
+library(ggplot2)
+
+b <- ggplot() +  
+  #Scatter plot
+  geom_point(data=Final_project, aes(x=error, y=coefficient),color='black', size=1, shape=16) + geom_text(data=Final_project, aes(x=error, y=coefficient, hjust=-0.5, vjust=-0.5, label=rownames(Final_project)), size=3, fontface=2 ) + 
+  
+  #Add line corresponding to 2 times the standard error
+ geom_smooth(data=Final_project, aes(x=error, y=twoxerror), fill="white", color='cyan3', size= 0.5, fullrange=TRUE) 
+
+  #Add title//Subtitle//axes//caption//tag//theme 
+  
+b <- b + labs(
+  title = 'Figure 2.', 
+  subtitle = 'Relation of Estimated Employment Elasticity to Standard Error',
+  x='Standard Error of Estimate', 
+  y= 'Estimated Elasticity', 
+  caption = 'Points = Actual Elasticity',
+  tag = 'b)') + theme_bw()
+
+#Personalize : ---> POLICE = face [1 (normal); 2(bold); 3(italic); 4(bold.italic)]
+
+b <- b + theme(
+  plot.title = element_text(face=2, color='red', hjust=0.5, size=15), 
+  plot.subtitle = element_text(face=3, color='black', hjust=0.5, size=10),
+  plot.caption = element_text(hjust=0, size = 8), 
+
+)
+
+print(b)
+
+```
+
+`The numbers in the figure refer to the following studies: 1) Hyman Kaitz, 1970; 2) Jacob Mincer, 1976;` 
+`3) Edward Gramlich, 1976; 4) Finis Welch, 1976; 5) James Ragan, 1977; 6) Michael Wachter and Choongsoo Kim,` 
+`1979; 7) George Iden, 1980; 8) Ragan, 1981; 9) John M. Abowd and Mark R. Killingsworth,1981;`
+`10) Charles Betsey and Bruce Dunson, 1981; 11) Brown et al., 1983; 12) Daniel Hamermesh, 1981;` 
+`13) Solon, 1985; 14) Wellington, 1991; 15) Klerman, 1992. '`
+
+***
+We were able to reproduce Figure 2 from this meta-analysis identically.
+
+It can be seen that **Study 9** and **Study 15** (*Abows and Killingsworth*, 1981; *Klerman*, 1992) are well below the line while *Iden's* **Study 7** is well above the line. 
+
+Generally, if the true effect of the minimum wage on employment was constant over time and the estimated coefficients in the literature were unbiased, then the estimates of **the elasticity of employment with respect to the minimum wage are close to the line** - 2 times their standard errors. 
+
+***
+# Conclusion
+
+> What could explain the combined tendency of t-ratios to decrease with sample size and t-ratios to equal 2, regardless of the size of the estimated minimum wage effect? 
+
+One possibility is **structural change**: the real effect of the minimum wage may have declined over time and at a faster rate than the decline in the estimated standard error.
+
+If there has been a structural change, one could conclude that the minimum wage now has an insignificant effect on employment, based on time series estimates that include the more recent data (*Wellington*, 1991; *Klerman*, 1992).
+
+A more plausible explanation for these results is that **studies in the literature have been affected by specification and publication biases**, induced by the tendencies of editors and authors to look for negative and statistically significant estimates of the effect of wages on employment.
+
+Some researchers follow the criterion of selecting specifications that achieve t-ratios greater than 2, so these specifications are over-represented in the early studies. As later researchers feel obliged to reproduce the same pattern as in the earlier literature, the new studies found weaker minimum wage effects. 
+
+The main conclusion is that researchers may need to temper the inferences they draw from a body of published studies and even from literature that seems to point to a particular conclusion.
+
+> The authors therefore conclude in this study that there is a negative relationship between an increase in the minimum wage and a decrease in the employment rate. However, more recent studies show that this relationship is much less pronounced and even no longer exists.
+
+***
+# New data
+
+We then introduced new studies by *Jared Bernstein and John Schmitt* from June 2000 and *Paul Wolfon* from 1998. With those studies we were able to update the graphs to see and interpret the differences.
+
+***
+## Figure 3
+
+```{r}
+library(ggplot2)
+
+# Scatter plot
+a <- ggplot(New_Data, aes(x=squarerootdegreesoffreedom, y=tstatistic)) + geom_point(color = 'black', size=1, shape=16) + geom_text(size=3,hjust=-0.5, vjust=-0.5,aes(fontface=2), label=rownames(New_Data))
+
+# Ajouter la droite de regression
+a <- a + geom_smooth(method=lm, se= FALSE,color='darkseagreen', size= 0.7, fullrange=TRUE)
+
+# Add title
+a <- a + labs(
+  title='Figure 3.',
+  subtitle= 'Relation of Estimated t Ratios To Sample Size with the addition of new data',
+  x="Square Root of Degrees of Freedom", 
+  y = "Absolute t ratio",
+  caption = 'Points = Actual',
+  tag = 'a)') + theme_bw()  
+
+#Personalize : ---> POLICE = face [1 (normal); 2(bold); 3(italic); 4(bold.italic)]
+
+a <- a + theme(
+  plot.title = element_text(face=2, color='red', hjust=0.5, size=15), 
+  plot.subtitle = element_text(face=3, color='black', hjust=0.5, size=10),
+  plot.caption = element_text(hjust=0, size = 8))
+
+print(a)
+```
+
+***
+It can be seen that in this figure 3, the slope of the line is much less pronounced, leading to a much smaller negative relationship.
+
+**Basic model (Kaitz)**: the one that shows a disemployment effect of 1-3% due to the 10% increase in the minimum wage.
+
+> It can be said that thanks to this new study of *Jared Bernstein and John Schmitt* (1954 - 2000, quarterly model) which represents the extension of the basic model, gives a statistically insignificant coefficient of **-0.061**. Thus, ignoring statistical significance, a 10% increase in the minimum wage would decrease the employment rate of teenagers by less than 1%.
+
+In *Paul Wolfon's* study, he proposes a new model in which the results are systematically lower than those of the basic quarterly model and are therefore not statistically significant - the non-significant coefficient is **-0.032**.
+
+A possible explanation for the pattern of insignificance shown in this figure is that the low-wage workforce has become more productive over time, allowing it to absorb minimum wage increases with less disruption.
+
+> In this analysis of Jared Bernstein and John Schmitt, they conclude that minimum wage increases do not lower the employment rate and exclude low-wage workers from the labour market. Indeed, the negative effects never exceed the level where the benefits for low-wage workers would be outweighed by their costs in terms of job losses. This policy of increasing the minimum wage even helps many minority groups in the US.
+
+***
+# Bibliography 
+
+- [David Card and Alan Krueger](https://davidcard.berkeley.edu/papers/ts-min-wage.pdf)
+- [Jared Bernstein and John Schmitt](https://www.epi.org/publication/briefingpapers_min_wage_bp/)
+
+
+
+
+```{r}
+renv::snapshot()
+```
+
+```{r}
+library("groundhog")
+pkgs <- c("readxl", "ggplot2","DT")
+groundhog.library(pkgs, date = "2022-05-25")
+```
+
+
+
+
